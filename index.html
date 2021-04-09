@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
+  <title>ToDoLIst</title>
+</head>
+<body>
+  <header> 
+
+  </header>
+  <div class="container">
+    <div class="tasks">
+      <div class="tasks__header">
+        <button class="share-button"> Share list </button>
+        <h2> Task list </h2>
+        <button class="deleteAll-button">Delete all</button>
+      </div>
+      <div data-container class="tasks__incompleted">
+        <div class="task-blank">
+        </div>
+      </div>
+      <div class="tasks__message">
+
+      </div>
+      <div class="tasks__input">
+        <form class="add-task">
+          <input type="text" class="new-task" placeholder="New task...">
+        </form>
+      </div>
+      <div class="tasks__summary">
+        <div class="hr"></div>
+        <p class="status">
+          <span class="status__incompleted">
+          </span>
+          /
+          <span class="status__completed"/>
+        </span>
+          (
+            <span class="status__percent"/>
+            </span>
+          done)
+        </p>
+      </div>
+      <div data-container class="tasks__completed">
+        <div class="task-blank">
+        </div>
+      </div>
+      <div class="tasks__modal">
+        <div class="modal-content">
+          <p> Are you sure you want to delete task <span></span> ? </p>
+          <div class="modal-buttons">
+            <button> Yes </button>
+            <button> No </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
