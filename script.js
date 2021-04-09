@@ -4,15 +4,17 @@ const addTaskForm = document.querySelector('.add-task'),
   incompletedTasks = document.querySelector('.tasks__incompleted'),
   completedTasks = document.querySelector('.tasks__completed'),
   containers = document.querySelectorAll("[data-container]"),
-  summaryStatus = document.querySelector('.tasks__summary');
-  modal = document.querySelector('.tasks__modal');
-  modalButtons = document.querySelectorAll('.modal-buttons');
+  summaryStatus = document.querySelector('.tasks__summary'),
+  modal = document.querySelector('.tasks__modal'),
+  modalButtons = document.querySelectorAll('.modal-buttons'),
+  sharebutton = document.querySelector('.share-button');
 
 document.addEventListener("DOMContentLoaded", getDataOnPageReload);
 addTaskForm.addEventListener('submit', addTask);
 incompletedTasks.addEventListener('click', clickOnTask)
 completedTasks.addEventListener('click', clickOnTask);
 deleteAll.addEventListener('click', deleteAllTasks)
+sharebutton.addEventListener('click', copyUrl)
 
 
 let tasksList = [];
@@ -221,7 +223,6 @@ function checkPosition () {
   const tasksArrOnPage = [...document.querySelectorAll('.task')].map((item) => {
     return item.id;
   });
-  console.log(tasksList)
   const SortedTasks = tasksArrOnPage.map((itemOld) => {
     let newItem;
     tasksList.forEach((item) => {
@@ -239,4 +240,33 @@ function checkDragSummary(e) {
   taskElement.classList.remove('task_selected');
   
   changeTaskStatus(taskElement)
+};
+
+function copyUrl() {
+  createShortLink().then((data) => {
+    const el = document.createElement('textarea');
+    el.value = data.shortUrl;
+    el.setAttribute('readonly', '');
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  })
+}
+
+async function createShortLink() {
+  const res = await fetch("https://api.rebrandly.com/v1/links", {
+    method: "POST",
+    headers: {
+      apikey: '6447651e84dc4b20ad11b86932fd1359',
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      destination: window.location.href,
+      domain: { fullName: "rebrand.ly" },
+    }),
+  })
+  return res.json()
 }
