@@ -14,7 +14,9 @@ incompletedTasks.addEventListener('click', clickOnTask)
 completedTasks.addEventListener('click', clickOnTask);
 deleteAll.addEventListener('click', deleteAllTasks)
 
-let tasksList = [],
+
+let tasksList = [];
+
 
 // ===== Creating tasks
 
@@ -44,7 +46,7 @@ function showTask (task) {
     <button class="check-button"></button>
     <p>${task.text}</p>
     <button class="delete-button">
-      <img src="https://icons-for-free.com/iconfiles/png/512/delete+remove+trash+trash+bin+trash+can+icon-1320073117929397588.png">
+    <img src="https://icons-for-free.com/iconfiles/png/512/delete+remove+trash+trash+bin+trash+can+icon-1320073117929397588.png">
     </button>
   `
   if(task.completed) {
@@ -58,7 +60,7 @@ function showTask (task) {
   if(task === lastItem) {
     calculateSummary()
   }
-};
+}
 
 function calculateSummary() {
   checkPosition()
