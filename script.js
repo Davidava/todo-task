@@ -1,71 +1,88 @@
 const addTaskForm = document.querySelector('.add-task'),
-  addTaskInput = document.querySelector('.new-task'),
   deleteAll = document.querySelector('.deleteAll-button'),
   incompletedTasks = document.querySelector('.tasks__incompleted'),
   completedTasks = document.querySelector('.tasks__completed'),
-  containers = document.querySelectorAll("[data-container]"),
   summaryStatus = document.querySelector('.tasks__summary'),
-  modal = document.querySelector('.tasks__modal'),
-  modalButtons = document.querySelectorAll('.modal-buttons'),
-  sharebutton = document.querySelector('.share-button');
+  sharebutton = document.querySelector('.share-button'),
+  message = document.querySelector('.tasks__message');
+  socialurl = [
+    document.querySelector('.telegram-button'),
+    document.querySelector('.facebook-button'),
+    document.querySelector('.linkedin-button'), 
+    document.querySelector('.whatsapp-button'),
+    document.querySelector('.twitter-button'),
+  ];
 
-document.addEventListener("DOMContentLoaded", getDataOnPageReload);
-addTaskForm.addEventListener('submit', addTask);
-incompletedTasks.addEventListener('click', clickOnTask)
-completedTasks.addEventListener('click', clickOnTask);
-deleteAll.addEventListener('click', deleteAllTasks)
-sharebutton.addEventListener('click', copyUrl)
+document.addEventListener("DOMContentLoaded", getDataOnPageReload),
+addTaskForm.addEventListener('submit', addTask),
+incompletedTasks.addEventListener('click', clickOnTask),
+completedTasks.addEventListener('click', clickOnTask),
+deleteAll.addEventListener('click', deleteAllTasks),
+sharebutton.addEventListener('click', copyUrl);
+socialurl.forEach(element=> {
+  element.addEventListener('click', socialShareRef)
+})
 
 
-let tasksList = [];
-
-
-// ===== Creating tasks
+// ===== Creating tasks 
 
 function addTask(e) {
   e.preventDefault();
 
+  const addTaskInput = document.querySelector('.new-task');
   if (addTaskInput.value) {
-    let task = {};
-    task.id = Math.random().toString(36).substr(2, 9);
-    task.text = addTaskInput.value;
-    task.completed = false;
-
-    tasksList.push(task);
-    showTask(task);
+    const taskText = addTaskInput.value;
+    showTask(taskText);
+    makeTasksList();
     dragAndDrop();
-  }
-}
+  };
+};
 
-function showTask (task) {
+function showTask (text, completed) {
   el = document.createElement('div');
 
   el.classList.add('task');
-  el.setAttribute("id", task.id);
+  
   el.setAttribute("draggable", true);
 
   el.innerHTML = `
     <button class="check-button"></button>
-    <p>${task.text}</p>
+    <p>${text}</p>
     <button class="delete-button">
-    <img src="https://icons-for-free.com/iconfiles/png/512/delete+remove+trash+trash+bin+trash+can+icon-1320073117929397588.png">
+      <i class="far fa-trash-alt"></i>
     </button>
   `
-  if(task.completed) {
+  if(completed) {
     el.classList.add('task_completed')
     completedTasks.append(el)
   } else {
     incompletedTasks.append(el);
   }
   addTaskForm.reset();
-  const lastItem = tasksList[tasksList.length - 1];
-  if(task === lastItem) {
-    calculateSummary()
-  }
 }
 
-function calculateSummary() {
-  checkPosition()
+
+// ==== Operations after changing tasks status
+
+function changePercentColor(complPercent) {
+  percentElement = document.querySelector('.status__percent')
+  if (complPercent > 0 && complPercent < 50) {
+    message.innerHTML = "";
+    percentElement.style.color = 'red';
+  } else if (complPercent >= 50 && complPercent <= 99) {
+    message.innerHTML = "";
+    percentElement.style.color = 'orange';
+  } else if (complPercent === 100) {
+    message.innerHTML = "";
+    percentElement.style.color = "green";
+    message.innerHTML = `
+      <div>🎊</div>
+      <div>All done!</div>
+      `;
+  }
+};
+
+function calculateSummary(tasksList) {
   const completedTask = tasksList.filter(item => item.completed === true).length
   complPercent = completedTask / tasksList.length * 100
   summaryStatus.classList.add('tasks__summary_active')
@@ -76,59 +93,105 @@ function calculateSummary() {
         ${completedTask}
       </span>
       /
-      <span class="status__completed"/>
+      <span class="status__completed">
         ${tasksList.length}
       </span>
       (
-      <span class="status__percent"/>
+      <span class="status__percent">
         ${complPercent.toFixed(0)}%
       </span>
       done)
     </p>
   `
-}
+  changePercentColor(complPercent)
+};
+
+function changeTaskStatus(task, moveTask) {
+  if(moveTask) {
+    if (task.parentElement.classList.contains('tasks__completed')) {
+      incompletedTasks.append(task)
+      task.classList.remove('task_completed');
+    } else {
+      completedTasks.append(task)
+      task.classList.add('task_completed');
+    }
+  } else {
+    if (task.parentElement.classList.contains('tasks__completed')) {
+      task.classList.add('task_completed');
+    } else {
+      task.classList.remove('task_completed');
+    }
+  }
+  makeTasksList ()
+};
+
+
+// ===== Operations with tasks
+
+function makeTasksList () {
+  const tasksOnPage = [...document.querySelectorAll('.task')];
+
+  if(tasksOnPage.length === 0) {
+    message.innerHTML = `<div> You don't have tasks to do </div>`;
+    summaryStatus.classList.remove('tasks__summary_active')
+    return
+  }
+
+  const sortedTasks = tasksOnPage.map((item => {
+    let obj = {};
+    obj.text = item.outerText;
+    if(item.parentNode.classList.contains('tasks__incompleted')) {
+      obj.completed = false;
+    } else {
+      obj.completed = true;
+    }
+    return obj
+  }))
+  message.innerHTML = '';
+  passQuery (sortedTasks)
+  calculateSummary(sortedTasks)
+};
 
 function clickOnTask (e) {
   const task = e.target.parentElement
   if(e.target.closest('.check-button')) {
     changeTaskStatus(task, true)
   } else if(e.target.matches('.delete-button')) {
-    openModalWindow(e)
+    task.classList.add('task_selected');
+    openModalWindow()
   }
-}
+};
 
-function openModalWindow (e) {
-  const task = e.target.parentElement
-  const modalText = modal.children[0].children[0].children[0]
+function openModalWindow () {
+  const modalWindow = document.querySelector('.tasks__modal');
+  const task = document.querySelector('.task_selected');
+  const modalText = modalWindow.children[0].children[0].children[0]
+
   modalText.innerText = task.parentElement.children[1].innerText
-  task.classList.add('task_selected');
+
   if(task.classList.contains('task_completed')) {
     modalText.classList.add ( 'completed')
   } else {
     modalText.classList.remove ( 'completed')
   }
+
   document.body.classList.add('show-modal')
-  modal.addEventListener('click', deleteTask)
-}
+
+  modalWindow.addEventListener('click', deleteTask)
+};
 
 function deleteTask(e) {
-  const button = e.target.innerText
+  const button = e.target
   const taskSelected = document.querySelector('.task_selected')
-  if(button==='Yes') {
-    const taskInArray = tasksList.find(item => item.id === taskSelected.id)
-    taskSelected.remove()
-    tasksList.splice(tasksList.indexOf(taskInArray), 1)
-    calculateSummary()
-    if(tasksList.length === 0) {
-      summaryStatus.classList.remove('tasks__summary_active')
-    }
+  if(button.tagName === 'BUTTON') {
+    if(button.innerText === 'Yes') {
+      taskSelected.remove()
+      makeTasksList()
+    };
     document.body.classList.remove('show-modal')
     taskSelected.classList.remove('task_selected')
-  } else if(button==='No') {
-    document.body.classList.remove('show-modal')
-    taskSelected.classList.remove('task_selected')
-  }
-}
+  };
+};
 
 function deleteAllTasks() {
   const url = `${window.location.protocol}//${window.location.host}${window.location.pathname}`
@@ -136,45 +199,24 @@ function deleteAllTasks() {
   summaryStatus.classList.remove('tasks__summary_active')
   incompletedTasks.innerHTML = '<div class="task-blank">'
   completedTasks.innerHTML = '<div class="task-blank">'
-  tasksList = []
-
-}
-
-
-function changeTaskStatus(task, moveTask) {
-  const taskLocal = tasksList.find(item => item.id === task.id)
-  if(moveTask) {
-    if (task.parentElement === completedTasks) {
-      incompletedTasks.append(task)
-      task.classList.remove('task_completed');
-      taskLocal.completed = false
-    } else {
-      completedTasks.append(task)
-      task.classList.add('task_completed');
-      taskLocal.completed = true
-    }
-  } else {
-    if (task.parentElement === completedTasks) {
-      task.classList.add('task_completed');
-      taskLocal.completed = true
-    } else {
-      task.classList.remove('task_completed');
-      taskLocal.completed = false
-    }
-  }
-  calculateSummary()
-}
+  message.innerHTML = `<div> You don't have tasks to do </div>`;
+};
 
 // ===== Drag & Drop 
 
 function dragAndDrop() {
-  const taskElements = document.querySelectorAll('.task')
+  const taskElements = document.querySelectorAll('.task');
+  const containers = document.querySelectorAll("[data-container]");
+
   taskElements.forEach((element) => {
     element.addEventListener('dragstart', () => {
       element.classList.add('task_selected');
     });
 
-    element.addEventListener('dragend',  checkDragSummary);
+    element.addEventListener('dragend',  () => {
+      element.classList.remove('task_selected');
+      changeTaskStatus(element)
+    });
   });
 
   containers.forEach((element) => {
@@ -184,7 +226,7 @@ function dragAndDrop() {
       const activeElement = document.querySelector('.task_selected');
       const currentElement = e.target;
 
-      if(activeElement !== currentElement) {
+      if(activeElement !== currentElement && element) {
         if(currentElement.classList.contains('task-blank')) {
           element.appendChild(activeElement)
         } else if (currentElement.classList.contains('task')) {
@@ -196,20 +238,24 @@ function dragAndDrop() {
       }
     });
   });
-}
+};
+
+// ===== Reloading page
 
 function getDataOnPageReload() {
   const urlSearch = window.location.search.slice(1);
-  if(urlSearch < 15) {
+  if(urlSearch.length < 10) {
+    message.innerHTML = `<div> You don't have tasks to do </div>`;
     return
   }
   const decodeStr = JSON.parse(window.atob(urlSearch))
   tasksList = decodeStr
   tasksList.forEach(item => {
-    showTask (item)
+    showTask (item.text, item.completed)
   })
+  makeTasksList()
   dragAndDrop()
-}
+};
 
 function passQuery (SortedTasks) {
   const encodeStr = window.btoa(JSON.stringify(SortedTasks))
@@ -217,44 +263,9 @@ function passQuery (SortedTasks) {
   window.history.pushState(null, null, url);
   const newUrl = `${url}?${encodeStr}`;
   window.history.pushState(null, null, newUrl);
-}
- 
-function checkPosition () {
-  const tasksArrOnPage = [...document.querySelectorAll('.task')].map((item) => {
-    return item.id;
-  });
-  const SortedTasks = tasksArrOnPage.map((itemOld) => {
-    let newItem;
-    tasksList.forEach((item) => {
-      if (item.id == itemOld) {
-        newItem = item;
-      }
-    });
-    return newItem;
-  });
-  passQuery (SortedTasks)
-}
-
-function checkDragSummary(e) {
-  taskElement = e.target
-  taskElement.classList.remove('task_selected');
-  
-  changeTaskStatus(taskElement)
 };
 
-function copyUrl() {
-  createShortLink().then((data) => {
-    const el = document.createElement('textarea');
-    el.value = data.shortUrl;
-    el.setAttribute('readonly', '');
-    el.style.position = 'absolute';
-    el.style.left = '-9999px';
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-  })
-}
+// ===== Share Url
 
 async function createShortLink() {
   const res = await fetch("https://api.rebrandly.com/v1/links", {
@@ -269,4 +280,42 @@ async function createShortLink() {
     }),
   })
   return res.json()
+};
+
+function copyUrl() {
+  let tooltipText = document.querySelector('.tooltiptext')
+  tooltipText.innerHTML = `<span class="tooltiptext">Copied</span>`
+
+  createShortLink().then((data) => {
+    const el = document.createElement('textarea');
+    el.value = data.shortUrl;
+    el.setAttribute('readonly', '');
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  })
 }
+
+function socialShareRef (e) {
+  e.preventDefault()
+  const postTitle = encodeURI(`Hello! Create your todo list: `);
+
+  button = e.target
+
+  createShortLink().then((data) => {
+    if(button.classList.contains('telegram-button')) {
+      window.open(`https://t.me/share/url?url=${data.shortUrl}&title=${postTitle}`, "_blank")
+    } else if(button.classList.contains('facebook-button')) {
+      window.open(`https://www.facebook.com/sharer.php?u=${data.shortUrl}`, "_blank")
+    } else if(button.classList.contains('linkedin-button')) {
+      window.open(`https://www.linkedin.com/shareArticle?url=${data.shortUrl}&title=${postTitle}`, "_blank")
+    } else if(button.classList.contains('whatsapp-button')) {
+      window.open(`https://api.whatsapp.com/send?text=${postTitle} ${data.shortUrl}`, "_blank")
+    } else if(button.classList.contains('twitter-button')) {
+      window.open(`https://twitter.com/share?url=${data.shortUrl}&text=${postTitle}`, "_blank")
+    };
+  });
+};
