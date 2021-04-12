@@ -30,6 +30,19 @@ body.show-modal {
 body.show-modal .tasks__modal{
   visibility: visible;
 }
+
+.container {
+  position: relative;
+  margin: 60px auto 80px auto;
+  padding: 20px;
+  font-size: 18px;
+  color: #2c3e50;
+  width: 60%;
+  border-radius: 5px;
+  background-color: rgb(247, 247, 247);
+}
+
+/*Social refs block*/
 .refs {
   position: fixed;
   display: flex;
@@ -81,16 +94,7 @@ body.show-modal .tasks__modal{
   color: #0088cc;
 }
 
-.container {
-  position: relative;
-  margin: 60px auto 80px auto;
-  padding: 20px;
-  font-size: 18px;
-  color: #2c3e50;
-  width: 60%;
-  border-radius: 5px;
-  background-color: rgb(247, 247, 247);
-}
+/*Modal Window*/
 
 .tasks__modal {
   visibility: hidden;
@@ -112,6 +116,7 @@ body.show-modal .tasks__modal{
   text-align: center;
   
 }
+
 .modal-content p {
   padding-bottom: 10px;
 }
@@ -130,6 +135,7 @@ body.show-modal .tasks__modal{
   transform: scale(1.15);
 }
 
+/*Tasks Header*/
 .tasks__header {
   display: flex;
   justify-content: space-between;
@@ -156,7 +162,6 @@ body.show-modal .tasks__modal{
   visibility: visible;
 }
 
-
 .deleteAll-button {
   padding: 5px;
   height: fit-content;
@@ -171,6 +176,7 @@ body.show-modal .tasks__modal{
   background-color: #ff927fc9;
 }
 
+/* Tasks Input*/
 .tasks__input {
   margin-right: auto;
   margin-left: auto;
@@ -188,12 +194,21 @@ body.show-modal .tasks__modal{
   border-bottom: 1px dashed #d3d3d3;
   background-color: transparent;
 }
+
+.hr {
+  flex-grow: 1;
+  border: none;
+  border-bottom: 1px solid #d3d3d3;
+}
+
+/* Task*/
 .task {
   padding-top: 5px;
   padding-bottom: 5px;
   display: flex;
   align-items: center;
 }
+
 .check-button:hover {
   background: #7fffd450;
   transition: all 0.3s ease;
@@ -202,9 +217,11 @@ body.show-modal .tasks__modal{
 .task p {
   margin-left: 20px;
 }
+
 .delete-button {
   transition: .2s;
 }
+
 .delete-button:hover {
   transform: scale(1.15);
 }
@@ -216,7 +233,6 @@ body.show-modal .tasks__modal{
   border-radius: 50%;
   cursor: pointer;
 }
-
 
 .task_completed {
   color: #d3d3d3;
@@ -230,9 +246,18 @@ body.show-modal .tasks__modal{
 
 .delete-button {
   margin-left:auto
-
 }
 
+.task-blank {
+  padding-top: 0.1rem;
+}
+
+.task_selected {
+  background-color: rgb(226, 226, 226);
+   opacity: .5;
+}
+
+/* Message */
 .tasks__message {
   padding-top: 10px;
   padding-bottom: 10px;
@@ -243,6 +268,7 @@ p .completed {
   text-decoration: line-through;
 }
 
+/* Tasks Areas*/
 .tasks__incompleted {
   padding-top: 20px;
   padding-bottom: 20px;
@@ -253,29 +279,20 @@ p .completed {
   display: flex;
   flex-direction: column-reverse;
 }
+
+/* Tasks summary*/
 .tasks__summary {
   display: none;
   align-items: flex-end;
 }
+
 .tasks__summary_active {
   padding-top: 20px;
   padding-bottom: 20px;
   display: flex;
 }
-.hr {
-  flex-grow: 1;
-  border: none;
-  border-bottom: 1px solid #d3d3d3;
-}
-.task-blank {
-  padding-top: 0.1rem;
-}
-.task_selected {
-  background-color: rgb(226, 226, 226);
-   opacity: .5;
-}
 
-
+/* Mobile*/
 @media (max-width: 500px) {
   .refs {
     width: 100%;
