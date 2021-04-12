@@ -248,8 +248,7 @@ function getDataOnPageReload() {
     message.innerHTML = `<div> You don't have tasks to do </div>`;
     return
   }
-  const decodeStr = JSON.parse(window.atob(urlSearch))
-  tasksList = decodeStr
+  const tasksList = JSON.parse(decodeURI(window.atob(urlSearch)))
   tasksList.forEach(item => {
     showTask (item.text, item.completed)
   })
@@ -258,10 +257,10 @@ function getDataOnPageReload() {
 };
 
 function passQuery (SortedTasks) {
-  const encodeStr = window.btoa(JSON.stringify(SortedTasks))
+  const codedStr = window.btoa(encodeURI(JSON.stringify(SortedTasks)))
   const url = `${window.location.protocol}//${window.location.host}${window.location.pathname}`
   window.history.pushState(null, null, url);
-  const newUrl = `${url}?${encodeStr}`;
+  const newUrl = `${url}?${codedStr}`;
   window.history.pushState(null, null, newUrl);
 };
 
